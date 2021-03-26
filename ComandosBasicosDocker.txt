@@ -1,0 +1,121 @@
+#--- Pastas de arquivos docker ---#
+#Imagens (não esquecer que cada imagem possui algumas "camadas" que formam a imagem total)
+/var/lib/docker/overlay2
+
+#Serviço docker 
+service docker (start/stop/restart)
+
+#Limpar todo o ambiente docker (remove containers parados, remove interfaces de rede, remove imagens e cache sem vínculos com nenhum containers)
+docker system prune
+docker system prune -a (remove também todas as imagens, limpa todo o cache de builds)
+
+#Lista todos os ID's das imagens
+docker images -a -q #O "-q" traz os IDs
+
+#Remoção de imagens
+docker rmi $(docker images -a -q) -f #Com o "-f" força pra todos os que estiverem em uso
+
+#Sair do container sem parar
+crtl p q
+
+#Imagem do docker em execução e parados
+/var/lib/docker/containers
+
+#--- Comandos básicos docker ---#
+
+#Containers rodando
+docker ps
+
+#Todos os containers parados e rodando
+docker ps -a
+
+#Ver portas mapeadas
+docker port imagem_id
+
+#Comandos para parar, rodar, ver imagens, excluir imagens, matar container, restart
+docker start imagem_id
+docker stop imagem_id
+docker restart imagem_id
+docker images
+docker rm imagem_id
+docker rm imagem_id -f
+docker rmi imagem_id
+
+#Rodando docker e entrando no bash
+docker run -it ubuntu /bin/bash
+
+#Rodar container detach com ping, dessa forma o container continua rodando e voltamos ao terminal da instância
+docker run -d centos:7 /bin/bash -c "ping 8.8.8.8" 
+
+#Rodar container detach com 50 comandos ping
+docker run -d centos /bin/bash -c "ping 8.8.8.8 -c 50"
+
+#Para acessar esse docker que subimos
+docker attach imagem_id
+
+#Outra forma de acessar um container rodando precisamos do PID (preferível porque não mata o container quando damos exit)
+#(-m mount namespace) (-u utsnamespace) (-n network namespace) (-p process namespace) (-i ip) (-t target PID)
+nsenter -m -u -n -p -i -t 12274 /bin/bash    
+
+#Também podemos usar o exec mais correto ainda
+docker exec -it imagem_id /bin/bash  
+
+#Usar volumes no docker run
+docker run -it -v /teste --name=teste-volume centos /bin/bash #"-v /teste nome do volume do container" "--name=testevolume nome do container"
+#Compartilhando esse volume com outro container
+docker run -it --volumes-from=teste-volume centos /bin/bash
+#Vincular diretórios
+docker run -v /data:/data
+#Para remover um volume   
+docker rm -v container_id ou docker volume rm volume_name                   
+
+#Ver o comando rodando no docker (-d)
+docker logs imagem_id
+#Acompanhar em tempo real
+docker logs -f imagem_id
+
+#Último container que rodamos
+docker ps -l
+
+#Dados sobre o container 
+docker inspect imagem_id
+docker inspect imagem_id | grep Pid
+
+#Informações relevantes sobre containers do docker rodando, parados, imagens, OS, CPU, memória, etc
+docker info
+
+#Argumentos como memória ou cpu
+docker run memory=1g
+docker run --cpu-shares=256
+
+#Alguns parâmetros do docker como PID, UID, comando rodando
+docker top imagem_id
+
+#Enviando imagem com tag para o docker hub
+#Colocando tag na imagem
+docker tag <src_image>:<Tag> <docker_hub_user>/<destination_image>:<tag> #Exemplo docker tag imagem-teste:latest alexvernize/imagem-teste-nova:latest
+#Fazer login
+docker login docker.io
+#Só enviar a imagem 
+docker push alexvernize/imagem-teste-nova:latest
+
+#Criar arquivo zip de container 
+docker save -o /caminho/imagem.tar imagem_id
+
+#Extrair arquivo zip container e criar imagem
+tar -tf /caminho/teste.tar
+docker load -i /caminho/teste.tar
+
+#Criar um servidor de docker para ser acessado na rede 
+sudo dockerd -H tcp://ip_do_server:2375 &
+                                  porta | & para devolver o prompt
+
+#Cliente para acessar
+sudo export DOCKER_HOST='tcp://ip_do_server:2375'
+#--- Para voltar ao normal o cliente ---#
+sudo export DOCKER_HOST=
+
+#Projeto github mais de um processo no Docker PID
+docker run --rm -t -i phusion/baseimage /sbin/my_init -- bash -l
+docker top imagem_id #Aparecerão vários processos rodando
+
