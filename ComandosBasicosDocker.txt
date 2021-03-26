@@ -5,19 +5,8 @@
 #Serviço docker 
 service docker (start/stop/restart)
 
-#Limpar todo o ambiente docker (remove containers parados, remove interfaces de rede, remove imagens e cache sem vínculos com nenhum containers)
-docker system prune
-docker system prune -a (remove também todas as imagens, limpa todo o cache de builds)
-docker volume prune (Para remover todos os volumes que não estão sendo usados)
-
-#Lista todos os ID's das imagens
-docker images -a -q #O "-q" traz os IDs
-
-#Remoção de imagens
-docker rmi $(docker images -a -q) -f #Com o "-f" força pra todos os que estiverem em uso
-
-#Sair do container sem parar
-crtl p q
+#Verificar a versão do docker
+docker version
 
 #Imagem do docker em execução e parados
 /var/lib/docker/containers
@@ -30,8 +19,8 @@ docker ps
 #Todos os containers parados e rodando
 docker ps -a
 
-#Ver portas mapeadas
-docker port imagem_id
+#Lista todos os ID's das imagens
+docker images -a -q #O "-q" traz os IDs
 
 #Comandos para parar, rodar, ver imagens, excluir imagens, matar container, restart
 docker start imagem_id
@@ -42,8 +31,17 @@ docker rm imagem_id
 docker rm imagem_id -f
 docker rmi imagem_id
 
+#Ver portas mapeadas
+docker port imagem_id
+
 #Rodando docker e entrando no bash
 docker run -it ubuntu /bin/bash
+
+#Rodando um container e mapeando uma porta 
+docker run -p <porta do host>:<porta do container> <nome da imagem>
+
+#Sair do container sem parar
+crtl p q
 
 #Rodar container detach com ping, dessa forma o container continua rodando e voltamos ao terminal da instância
 docker run -d centos:7 /bin/bash -c "ping 8.8.8.8" 
@@ -120,3 +118,12 @@ sudo export DOCKER_HOST=
 docker run --rm -t -i phusion/baseimage /sbin/my_init -- bash -l
 docker top imagem_id #Aparecerão vários processos rodando
 
+
+#Limpar todo o ambiente docker (remove containers parados, remove interfaces de rede, remove imagens e cache sem vínculos com nenhum containers)
+docker system prune
+docker system prune -a (remove também todas as imagens, limpa todo o cache de builds)
+docker volume prune (Para remover todos os volumes que não estão sendo usados)
+
+#Remoção de imagens
+docker rmi <ID da imagem ou nome da imagem>
+docker rmi $(docker images -a -q) -f #Com o "-f" força pra todos os que estiverem em uso
