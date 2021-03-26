@@ -8,6 +8,7 @@ service docker (start/stop/restart)
 #Limpar todo o ambiente docker (remove containers parados, remove interfaces de rede, remove imagens e cache sem vínculos com nenhum containers)
 docker system prune
 docker system prune -a (remove também todas as imagens, limpa todo o cache de builds)
+docker volume prune (Para remover todos os volumes que não estão sendo usados)
 
 #Lista todos os ID's das imagens
 docker images -a -q #O "-q" traz os IDs
